@@ -1,0 +1,151 @@
+/*
+Ex1: Sa se afiseze numele si prenumele, codul jobului si data la care au
+inceput lucrul salariatii angajati intre 03 Ianuarie 1990 si 07 Decembrie 1994. Se vor
+exclude din rezultat capetele intervalului. Se va utiliza operatorul BETWEEN, iar
+rezultatul se va ordona descrescator dupa numarul zilei. Afisati numele si prenumele
+pe o singura coloana numita Nume si Prenume.
+
+Rezolvare: am afisat datele cerute aplica operatorul BETWEEN pentru a verifica daca hire_date e intre 03 Ianuarie 1990 si 07 Decembrie 1994. 
+Deoarece opeatorul BETWEEN include si capetele intervalului, le-am exclus dupa manual verificand daca hire_date ul este diferit de capete.
+La final am ordonat descrescator dupa numarul zilei. Am folosit TO_CHAR(hire_date, 'DD') pentru a extrage ziua, si am zis DESC
+pentru a afisa in ordine descrescatoare.
+*/
+
+SELECT first_name, last_name, job_id, hire_date
+FROM employees
+WHERE hire_date between TO_DATE('03-JAN-1990') AND TO_DATE('07-DEC-1994') AND hire_date != TO_DATE('03-JAN-1990') 
+AND hire_date != TO_DATE('07-DEC-1994') ORDER BY TO_CHAR(hire_date, 'DD') DESC; 
+
+/*
+Ex2: Sa se listeze numele si salariile angajatilor care castiga mai mult de
+1500 si lucreaz? in departamentul 10 sau 30 si au exact doua caractere ‘A’ in nume
+(nu neaparat consecutive). Se vor eticheta coloanele drept Angajat si Salariu lunar.
+
+Rezolvare: am folosit alias urile "Angajat" si "Salariu lunar" pentru campurile first_name (imi cer scuze daca ala nu e numele ci e prenumele
+"ma bate" atat romana cat si engleza :) ) si salary. Am pus conditia salary > 1500 si am verificat daca numele angajatului contine doi de 'A'
+(am considerat ca prin 'A' se refera atat la caracterul 'a' cat si la 'A', ca altfel era o conditie pointless caci o singura litera e mare in nume)
+folosind functia LIKE('%A%A%') pentru UPPER(first_name), adica daca first_name ul, convertit cu litere mari, este un text de forma 
+"nr_var_carac + 'A' + nr_var_de_carac + 'A' + nr_var_carac"
+*/
+
+SELECT first_name "Angajat", salary "Salariu lunar", department_id
+FROM employees
+WHERE salary > 1500 AND UPPER(first_name) LIKE('%A%A%') AND (department_id = 30 OR department_id = 10);
+
+/*
+EX3: Sa se afiseze numele, codul jobului si salariul pentru toti salariatii al
+caror job contine sirul “CLERK” sau “REP” si salariul nu este egal cu 1000, 2000 sau
+3000. Atentie la ordinea efectuarii operatiilor si la precedenta operatorilor. Explicati!
+
+Rezolvare:
+Am dat select la campurile cerute de cerinta din tabelul employees. Conditiile sunt ca salary sa fie, pe rand, diferit
+de 1000, 2000 si 3000 iar job_id, cu upper de siguranta, sa aiba forma: "nr_var_carac + 'CLERK'/'REP' + nr_var_carac",
+verificarea fiind facuta folosind functia LIKE;
+*/
+
+SELECT first_name, job_id, salary
+FROM employees
+WHERE salary != 1000 AND salary != 2000 AND salary != 3000 AND UPPER(job_id) LIKE('%CLERK%') OR UPPER(job_id) LIKE('%REP%')
+ORDER BY salary;
+
+/*
+EX4: Scrieti o cerere care are urmatorul rezultat pentru fiecare angajat:
+<prenume_angajat> <nume angajat> castiga <salariu> lunar dar doreste
+<salariu de 3 ori mai mare>
+Exemplu: Steven King castiga 24000 lunar dar doreste 72000
+Etichetati coloana Salariu ideal. Pentru concatenare, utilizati atat functia
+CONCAT cat si operatorul “||”.
+
+Rezolvare: Am concatenat first_name ul cu concatenarea last_name ului cu un spatiu in fata dupa care am folosit operatorul "||"
+pentru a concatena textul obtinut deja cu textul " castiga " + salariul angajatului + " lunar doreste " + de 3 ori salariu lui 
+*/
+
+SELECT CONCAT(first_name, CONCAT(' ', last_name)) || ' castiga ' || salary || ' lunar dar doreste ' || salary * 3 "Salariu ideal"
+FROM employees;
+
+/*
+EX5: Sa se afiseze, pentru angajatii cu prenumele „Steven”, codul, numele si
+prenumele acestora, precum si codul departamentului in care lucreaza. Cautarea
+trebuie sa nu fie case-sensitive, iar eventualele blank-uri (spatii) care preced sau
+urmeaza numelui trebuie ignorate. Adica se presupune ca exista spatii libere atat
+inainte, cat si dupa nume, si se sterg utilizandu-se o functie destinata prelucrarii
+sirurilor de caractere.
+
+Rezolvare: vom da SELECT la campurile cerute. Conditia este ca UPPER de first_name, folosim UPPER deoarece vrem ca aceasta
+cautare sa nu fie case-sensitive, sa fie un text de forma "nr_var_carac + STEVEN + nr_var_carac", folosind functia LIKE
+*/
+
+SELECT employee_id, first_name, last_name, department_id
+FROM employees
+WHERE UPPER(first_name) LIKE('%STEVEN%');
+
+/*
+EX6: Sa se listeze numele, data angajarii si comisionul salariatilor care castiga
+comision. S? se eticheteze coloanele Nume angajat, Data angajarii si Comision.
+Utilizati functia RPAD pentru a determina ca data angajarii sa aiba lungimea de 20
+de caractere, adaugand caracterul ‘X’.
+
+Rezolvare: Am dat SELECT la coloanele cerute si le-am atribuit alias urile corespunzatoare intre ghilimele.
+Am aplicat functia RPAD pe hire_date pentru a determina ca aceasta din urma sa aiba lungimea de 20
+de caractere, adaugand caracterul ‘X’ si am verificat ca commission_pct sa fie diferit de null.
+*/
+
+SELECT first_name "Nume angajat", hire_date "Data angajarii", commission_pct*salary "Comision"
+FROM employees 
+WHERE LENGTH(RPAD(hire_date, 20, 'X')) = 20 AND commission_pct IS NOT NULL;
+
+/*
+EX7: Sa se afiseze numarul de zile r?mase pana la sfarsitul anului, utilizanduse formatul 31-12-2021, in raport cu ziua curenta. Se va eticheta coloana
+Numar_Zile si se va rotunji cu doua zecimale dupa virgula.
+
+Rezolvare: Am dat SELECT la diferenta dintre data de sfarsit de an, adica 31-DEC-2021, convertita in TO_DATE pentru a putea face
+diferenta cu SYSDATE, adica data actuala, pentru ca nu se putea face diferenta automata dintre un string si un date. Rezultatul
+operatiei descrise mai sus l-am rotunjit folosind functia ROUND cu 2 decimale dupa virgula. Am dat SELECT ... FROM DUAL; pentru ca
+calculam rezultatul unei functii care nu are legatura cu vreun tabel.
+*/
+
+SELECT ROUND(TO_DATE('31-DEC-2021') - SYSDATE, 2) "Numar zile"
+FROM DUAL;
+
+/*
+EX8: Sa se listeze codul, numele departamentului si codul managerului de
+departament. In cazul in care un departament nu are manager se va afisa mesajul
+Departamentul <department_id> nu are manager (ex: DEPARTAMENTUL 120 nu
+are manager).
+
+Rezolvare: Am listat codul si numele departamentului direct, in timp ce pe codul managerului am aplicat functia 
+NVL astfel: in cazul in care avem manager_id diferit de null, il afiseaza, altfel, afiseaza mesajul "Departamentul <department_id> nu
+are manager". Am convertit manager_id ul in TO_CHAR deoarece functia NVL are nevoie de tipuri de date compatibile iar NUMBER cu CHAR nu se potriveau.
+*/
+
+SELECT department_id, department_name, NVL(TO_CHAR(manager_id), 'Departamentul ' || department_id || ' nu are manager')
+FROM departments;
+
+/*
+EX9: Scrieti o cerere care afiseaza numele angajatului, codul departamentului
+in care acesta lucreaza si numele colegilor sai de departament. Se vor eticheta
+coloanele corespunzator.
+
+Rezolvare: Am afisat numele complet al angajatului, codul departamentului in care lucreaza si numele colegilor din acelasi
+departament si am etichetat coloanele corespunzator. Pentru a afisa colegii din acelasi departament am dat JOIN la tabel
+cu el insusi dupa care am pus conditia ca department_id ul angajatilor din perechile produsului cartezian sa fie identic
+dar in acelasi timp angajatii sa fie diferiti unul de celalalt prin verificarea codurile lor unice, daca sunt diferite atunci
+angajatii sunt diferiti
+*/
+
+SELECT e1.first_name || ' ' || e1.last_name "Numele angajatului", e1.department_id "Codul departamentului", e2.first_name || ' ' || e2.last_name "Numele colegului"
+FROM employees e1, employees e2
+WHERE e1.department_id = e2.department_id and e1.employee_id != e2.employee_id;
+
+/*
+EX10: Creati o cerere prin care sa se afiseze numele angajatilor, codul jobului, titlul job-ului, numele departamentului si salariul angaja?ilor. Se vor include si
+angajatii al caror departament nu este cunoscut. 
+
+Rezolvare: Am pus conditiile de join la cele 3 tabele, la conditia e.department_id = d.department_id(+)
+plus ul este necesar pentru a face corect join ul, incluzand si angajatii fara departament
+*/
+
+SELECT e.first_name || ' ' || e.last_name "Numele complet", j.job_id "Codul jobului", j.job_title "Titlul job-ului",
+NVL(d.department_name, 'Fara departament') "Numele departamentului", e.salary "Salariu"
+FROM employees e, jobs j, departments d
+WHERE e.job_id = j.job_id AND e.department_id = d.department_id(+);
