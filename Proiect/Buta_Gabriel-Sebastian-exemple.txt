@@ -1,0 +1,220 @@
+/*
+1)Sa se afiseze codul halei, codul service-ului auto din cadrul caruia face parte, suprafata si 
+orasul in care se afla fiecare hala.
+*/
+
+SELECT h.cod_hala, h.cod_serv_auto, h.suprafata, o.denumire
+FROM HALA h JOIN SERVICE_AUTO s ON (h.cod_serv_auto = s.cod_serv_auto) JOIN ADRESA a on (a.cod_adresa = s.cod_adresa) 
+JOIN ORAS o ON (o.cod_oras = a.cod_oras);
+
+/*
+2) Sa se afiseze angajatii care lucreaza la service-uri din Ramnicu Valcea.
+*/
+
+SELECT *
+FROM ANGAJAT
+WHERE cod_serv_auto IN (
+                        SELECT cod_serv_auto
+                        FROM SERVICE_AUTO
+                        WHERE cod_adresa IN (
+                                                SELECT cod_adresa
+                                                FROM ADRESA
+                                                WHERE cod_oras IN (
+                                                                    SELECT cod_oras
+                                                                    FROM ORAS
+                                                                    WHERE INITCAP(denumire) = 'Ramnicu Valcea'
+                                                                  )
+                                            )
+                    );
+
+/*
+3) Sa se afiseze data de azi, codul, numele si prenumele clientilor al caror nume se termina in 'ESCU' si au devenit 
+clienti al cel putin unui service intr-o zi de 14 a oricarei luni a oricarui an (ziua in care au fost introdusi in 
+baza de date)
+*/
+
+SELECT d.data_de_azi, c.cod_client, nume, prenume
+FROM CLIENT c JOIN APARTINE a ON (a.cod_client = c.cod_client), (
+                                                                    SELECT SYSDATE AS data_de_azi
+                                                                    FROM DUAL
+                                                                    ) d
+WHERE UPPER(nume) LIKE('%ESCU') AND EXTRACT(day FROM data_introducere) = '14';
+
+/*
+4)Sa se afiseze codul, suprafata si 
+abrevierea judetului in care se afla fiecare service.
+*/
+
+SELECT s.cod_serv_auto, s.suprafata, DECODE( o.denumire, 'RAMNICU VALCEA', 'VL',
+                                                                     'TARGU JIU',      'GJ',
+                                                                     'CRAIOVA',        'DJ',
+                                                                     'SIBIU',          'SB',
+                                                                     'BUCURESTI' ,     'B',
+                                                                                       'RO') AS "Cod_judet"                               
+FROM SERVICE_AUTO s JOIN ADRESA a on (a.cod_adresa = s.cod_adresa) 
+JOIN ORAS o ON (o.cod_oras = a.cod_oras);
+
+/*
+5)Sa se afiseze codul, denumirea si capitalul social al fiecarei companii de securitate.
+Daca o companie nu are capital social se va scrie 0
+*/
+
+WITH tabel_aux AS(
+                    SELECT *
+                    FROM AGENTIE_SECURITATE
+                 )
+SELECT cod_agentie_securitate, denumire, NVL(capital_social, 0) AS "CAPITAL SOCIAL"
+FROM tabel_aux;
+/*
+6)Sa se afiseze numele, prenumele, CNP ul si daca salariu angajatului este mic sau mare, in ordine descrescatoare a salariilor.
+Salariul unui angajat este mic daca valoarea sa este mai mica de 3000 si este mare in caz contrar.
+*/
+
+SELECT nume, prenume, CNP, CASE WHEN salariu < 3000 THEN 'MIC' ELSE 'MARE' END
+FROM ANGAJAT_AGENTIE
+ORDER BY -salariu;
+
+/*
+7)Sa se afiseze denumirea, adresa, orasul in care se afla si numarul de angajati pentru fiecare
+service care are cel putin 2 angajati
+*/
+
+SELECT sa.denumire, a.denumire, o.denumire, nr.nr_ang
+FROM SERVICE_AUTO sa JOIN ADRESA a ON (sa.cod_adresa = a.cod_adresa) JOIN ORAS o ON (a.cod_oras = o.cod_oras), (
+                                                                                                                SELECT cod_serv_auto, COUNT(cod_angajat) AS nr_ang
+                                                                                                                FROM ANGAJAT
+                                                                                                                GROUP BY cod_serv_auto
+                                                                                                                HAVING COUNT(cod_angajat) > 1
+                                                                                                               )nr
+WHERE sa.cod_serv_auto = nr.cod_serv_auto;
+
+
+-- Implementarea a 3 operatii de actualizare sau suprimare a datelor utilizând subcereri.
+
+-- actualizarea salariului angajatului cu id ul 7131 cu cel mai mare salariu existent in tabelul ANGAJAT
+
+UPDATE ANGAJAT
+SET salariu = (
+                SELECT MAX(salariu)
+                FROM ANGAJAT
+                )
+WHERE cod_angajat = 7131;
+ROLLBACK;
+SELECT * FROM ANGAJAT;
+
+-- Stergerea angajatului cu id-ul 7131
+DELETE FROM ANGAJAT
+WHERE cod_angajat = (
+                    SELECT cod_angajat
+                    FROM ANGAJAT
+                    where cod_angajat = 7131
+                    );
+ROLLBACK;
+SELECT * FROM ANGAJAT;
+
+-- Stergerea service-urilor care se afla in Targu Jiu
+
+SELECT * FROM SERVICE_AUTO;               
+DELETE FROM SERVICE_AUTO
+WHERE  cod_adresa IN (
+                        SELECT cod_adresa
+                        FROM ADRESA
+                        WHERE cod_oras IN (
+                                            SELECT cod_oras
+                                            FROM ORAS
+                                            WHERE UPPER(denumire) = 'TARGU JIU'
+                                            )
+                    );
+ROLLBACK;
+
+/*
+Formulati în limbaj natural si implementati in SQL: o cerere ce utilizeaza operatia outerjoin pe minimum 4 tabele
+
+Sa se afiseze codul angajatilor care au reparat cel putin o masina pe un canal sau pe un elevator fabricat de LIFTOMEX
+*/
+
+SELECT * FROM REPARA;
+WITH TABEL AS (
+                SELECT * 
+                FROM CLIENT c JOIN REPARA r ON (c.cod_client = r.cod_client) 
+                JOIN SPATIU_REPARARE sr ON (sr.cod_spatiu_reparare = r.cod_spatiu_reparare
+                AND sr.cod_hala = r.cod_hala AND sr.cod_serv_auto = r.cod_serv_auto)
+                )
+
+SELECT DISTINCT(cod_angajat) "Codul angajatului" 
+FROM TABEL t LEFT OUTER JOIN BRAND_ELEVATOR be ON (t.cod_elevator = be.cod_brand_elevator)
+WHERE UPPER(tip_spatiu) = 'CANAL' OR UPPER(NVL(denumire_brand, 'FARA_BRAND')) = 'LIFTOMEX';
+
+/*
+Formulati in limbaj natural si implementati în SQL:  doua cereri ce utilizeaza operatia division. 
+
+Sa se afiseze numerele de ordine (cod_hala) al halelor care au fost folosite de toate service-urile (daca toate service-urile
+au o hala cu ID ul x atunci se va afisa)
+*/
+
+SELECT DISTINCT cod_hala
+FROM HALA a
+WHERE NOT EXISTS
+                (SELECT 1
+                 FROM SERVICE_AUTO b
+                 WHERE NOT EXISTS
+                                 (
+                                 SELECT 1
+                                 FROM HALA c
+                                 WHERE a.cod_hala = c.cod_hala
+                                 AND c.cod_serv_auto = b.cod_serv_auto
+                                 )
+                );
+
+/*
+Sa se afiseze numarul de ordine (cod_spatiu_reparare) al spatiilor de reparare care au fost folosite de toate halele
+(daca toate halele au un spatiu de reparare cu ID ul x atunci se va afisa x)
+*/
+
+SELECT cod_spatiu_reparare
+FROM SPATIU_REPARARE
+
+MINUS
+
+SELECT cod_spatiu_reparare 
+FROM
+     ( 
+     SELECT cod_spatiu_reparare, cod_hala
+     FROM  (
+            SELECT DISTINCT cod_spatiu_reparare 
+            FROM SPATIU_REPARARE
+           ),
+           (
+            SELECT cod_hala 
+            FROM HALA
+           )
+
+     MINUS
+    
+     SELECT cod_spatiu_reparare, cod_hala 
+     FROM SPATIU_REPARARE
+     );
+
+-- Cererile de la cerinta 17
+
+--Cererea ineficienta
+SELECT * FROM APARTINE;
+SELECT nume, prenume
+FROM ANGAJAT a JOIN SERVICE_AUTO sa ON (a.cod_serv_auto = sa.cod_serv_auto)
+WHERE UPPER(denumire) LIKE ('A%');
+
+
+--Cererea eficienta
+SELECT nume, prenume
+FROM (
+        SELECT nume, prenume, cod_serv_auto
+        FROM ANGAJAT
+     )
+WHERE cod_serv_auto IN (
+                        SELECT cod_serv_auto
+                        FROM (
+                                SELECT cod_serv_auto, denumire
+                                FROM SERVICE_AUTO
+                              )
+                        WHERE UPPER(denumire) LIKE('A%')
+                        );

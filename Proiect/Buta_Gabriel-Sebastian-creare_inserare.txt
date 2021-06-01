@@ -1,0 +1,798 @@
+                  -- IN CAZ CA SE DORESTE RECREAREA BAZEI DE DATE DIN VARII MOTIVE TREBUIE EXECUTAT CODUL COMENTAT MAI JOS
+/*
+DROP TABLE REPARA;
+DROP TABLE SPATIU_REPARARE;
+DROP TABLE BRAND_ELEVATOR;
+DROP TABLE ANGAJAT;
+DROP TABLE TRUSA_SCULE;
+DROP TABLE BANC_LUCRU;
+DROP TABLE BRAND_BANC;
+DROP TABLE APARTINE;
+DROP TABLE CLIENT;
+DROP TABLE HALA;
+DROP TABLE ANGAJAT_AGENTIE;
+DROP TABLE SERVICE_AUTO;
+DROP TABLE AGENTIE_SECURITATE;
+DROP TABLE ADRESA;
+DROP TABLE ORAS;
+DROP SEQUENCE id_adresa;
+DROP SEQUENCE oras_id;
+DROP SEQUENCE id_agentie_sec;
+DROP SEQUENCE service_id;
+DROP SEQUENCE angajat_agen_id;
+DROP SEQUENCE hala_id;
+DROP SEQUENCE hala_serv_auto_id;
+DROP SEQUENCE client_id;
+DROP SEQUENCE apartine_client_id;
+DROP SEQUENCE apartine_serv_id;
+DROP SEQUENCE brand_banc_id;
+DROP SEQUENCE banc_lucru_id;
+DROP SEQUENCE trusa_scule_id;
+DROP SEQUENCE angajat_id;
+DROP SEQUENCE angajat_serv_auto_id;
+DROP SEQUENCE angajat_trusa_scule_id;
+DROP SEQUENCE brand_elevator_id;
+DROP SEQUENCE spatiu_rep_serv_auto_id;
+DROP SEQUENCE spatiu_rep_hala_id;
+DROP SEQUENCE spatiu_rep_sp_id;
+DROP SEQUENCE spatiu_rep_banc_id;
+DROP SEQUENCE repara_ang_id;
+DROP SEQUENCE repara_client_id;
+DROP SEQUENCE repara_serv_auto_id;
+DROP SEQUENCE repara_hala_id;
+DROP SEQUENCE repara_sp_rep_id;
+*/
+
+-- TABELUL ORAS
+CREATE TABLE ORAS
+                (
+                cod_oras NUMBER(5) CONSTRAINT pkey_oras PRIMARY KEY,
+                denumire VARCHAR2(25) NOT NULL,
+                POPULATIE NUMBER(8) NOT NULL
+                );
+
+CREATE SEQUENCE oras_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 10
+NOCACHE;
+
+INSERT INTO ORAS
+VALUES(oras_id.nextval, 'RAMNICU VALCEA', 100000);
+
+INSERT INTO ORAS
+VALUES(oras_id.nextval, 'TARGU JIU', 90000);
+
+INSERT INTO ORAS
+VALUES(oras_id.nextval, 'CRAIOVA', 200000);
+
+INSERT INTO ORAS
+VALUES(oras_id.nextval, 'SIBIU', 200000);
+
+INSERT INTO ORAS
+VALUES(oras_id.nextval, 'BUCURESTI', 1500000);
+
+SELECT * FROM ORAS;
+
+COMMIT;
+
+--TABELUL ADRESA
+
+CREATE TABLE ADRESA
+                    (
+                    cod_adresa NUMBER(5) CONSTRAINT pkey_adr PRIMARY KEY,
+                    denumire VARCHAR2(50) NOT NULL,
+                    cod_oras NUMBER(5) NOT NULL,
+                    CONSTRAINT fkey_oras_adr FOREIGN KEY (cod_oras) REFERENCES ORAS(cod_oras) ON DELETE CASCADE
+                    );
+
+CREATE SEQUENCE id_adresa
+MINVALUE 0
+START WITH 0
+INCREMENT BY 10
+NOCACHE;
+
+INSERT INTO ADRESA
+VALUES(id_adresa.nextval, 'STRADA FERDINAND NR.30', 10);
+
+INSERT INTO ADRESA
+VALUES(id_adresa.nextval, 'STRADA SIMION BARNUTIU NR.112', 30);
+
+INSERT INTO ADRESA
+VALUES(id_adresa.nextval, 'BULEVARDUL MAGHERU NR.93', 50);
+
+INSERT INTO ADRESA
+VALUES(id_adresa.nextval, 'STRADA METALURGISTILOR NR.31', 40);
+
+INSERT INTO ADRESA
+VALUES(id_adresa.nextval, 'STRADA CONSTANTIN BRANCUSI NR.17', 20);
+
+
+SELECT * FROM ADRESA;
+
+COMMIT;
+
+--TABELUL AGENTIE SECURITATE
+
+CREATE TABLE AGENTIE_SECURITATE
+                                (
+                                cod_agentie_securitate NUMBER(5) CONSTRAINT pkey_ag_sec PRIMARY KEY,
+                                denumire VARCHAR2(25) NOT NULL,
+                                capital_social NUMBER(7),
+                                CUI VARCHAR2(10) NOT NULL
+                                );
+
+CREATE SEQUENCE id_agentie_sec
+MINVALUE 0
+START WITH 7
+INCREMENT BY 10
+NOCACHE;
+
+INSERT INTO AGENTIE_SECURITATE
+VALUES(id_agentie_sec.nextval, 'SECURAX SRL', 150000, 'RO12437348');
+
+INSERT INTO AGENTIE_SECURITATE
+VALUES(id_agentie_sec.nextval, 'SAFEMIX SA', 15000, 'RO17383168');
+
+INSERT INTO AGENTIE_SECURITATE
+VALUES(id_agentie_sec.nextval, 'BIGIES SECURITY SA', 412000, 'RO97123693');
+
+INSERT INTO AGENTIE_SECURITATE
+VALUES(id_agentie_sec.nextval, 'BARO SAFE SERVICIES SA', NULL, 'RO93233911');
+
+INSERT INTO AGENTIE_SECURITATE
+VALUES(id_agentie_sec.nextval, 'FMI PROTECTION SA', 6000, 'RO91179312');
+
+SELECT * FROM AGENTIE_SECURITATE;
+
+COMMIT;
+
+--TABEL SERVICE
+
+CREATE TABLE SERVICE_AUTO
+                    (
+                    cod_serv_auto NUMBER(5) CONSTRAINT pkey_serv_auto PRIMARY KEY,
+                    denumire VARCHAR2(25) NOT NULL,
+                    cod_adresa NUMBER(5) NOT NULL,
+                    cod_agentie_securitate NUMBER(5) NOT NULL,
+                    SUPRAFATA NUMBER(5) NOT NULL,
+                    CONSTRAINT fkey_adr_serv_auto FOREIGN KEY (cod_adresa) REFERENCES ADRESA(cod_adresa)ON DELETE CASCADE,
+                    CONSTRAINT fkey_ag_sec_serv_auto FOREIGN KEY (cod_agentie_securitate) REFERENCES AGENTIE_SECURITATE(cod_agentie_securitate)
+                    );
+
+CREATE SEQUENCE service_id
+MINVALUE 0
+START WITH 5
+INCREMENT BY 10
+NOCACHE;
+
+INSERT INTO SERVICE_AUTO
+VALUES(service_id.nextval, 'WEFIXIT SRL', 50, 27, 160);
+
+INSERT INTO SERVICE_AUTO
+VALUES(service_id.nextval, 'ALLDAYREPAIR SA', 40, 17, 120);
+
+INSERT INTO SERVICE_AUTO
+VALUES(service_id.nextval, 'ANA ARE MASINI SRL', 30, 57, 60);
+
+INSERT INTO SERVICE_AUTO
+VALUES(service_id.nextval, 'MONDOFIX SA', 20, 37, 90);
+
+INSERT INTO SERVICE_AUTO
+VALUES(service_id.nextval, 'FIXOMANUL SRL', 10, 47, 20);
+
+SELECT * FROM SERVICE_AUTO;
+
+COMMIT;
+
+--TABEL ANGAJAT AGENTIE
+
+CREATE TABLE ANGAJAT_AGENTIE
+                            (
+                            cog_angajat_agentie NUMBER(5) CONSTRAINT pkey_ang_ag PRIMARY KEY,
+                            nume VARCHAR2(25) NOT NULL,
+                            prenume VARCHAR2(25) NOT NULL,
+                            CNP VARCHAR2(13) NOT NULL,
+                            cod_agentie_securitate NUMBER(5) NOT NULL,
+                            nr_telefon VARCHAR2(10) NOT NULL,
+                            varsta NUMBER(2) NOT NULL,
+                            salariu NUMBER(5) NOT NULL,
+                            tip_angajat VARCHAR2(25) NOT NULL,   --   MANAGER/PAZNIC
+                            spor_sef NUMBER(3),
+                            cod_serv_auto NUMBER(5),
+                            vechime NUMBER(2),
+                            CONSTRAINT fkey_ag_sec_ang_ag FOREIGN KEY (cod_agentie_securitate) REFERENCES AGENTIE_SECURITATE(cod_agentie_securitate),
+                            CONSTRAINT fkey_serv_auto_paznic FOREIGN KEY (cod_serv_auto) REFERENCES SERVICE_AUTO(cod_serv_auto) ON DELETE CASCADE
+                            );
+
+CREATE SEQUENCE angajat_agen_id
+MINVALUE 0
+START WITH 105
+INCREMENT BY 10
+NOCACHE;
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'MARGINEANU', 'RAPANDEL', 1890214396672, 17, '0756991177', 32, 1750, 'PAZNIC', NULL, 25, 5);          
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'ANDREESCU', 'VIOREL', 1860719401170, 57, '0739256173', 34, 2670, 'MANAGER', 30, NULL, NULL);  
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'COMANESCU', 'ANDREEA', 2770606381122, 17, '0722986339', 44, 1699, 'PAZNIC', NULL, 15, 15);  
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'PAVELESCU', 'DOREL', 1801212364132, 57, '0793691443', 40, 2010, 'PAZNIC', NULL, 35, 12);  
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'BLAVOSIVESCU', 'MIRUNA', 2820909274414, 17, '0778551923', 38, 4650, 'MANAGER', 35, NULL, NULL);
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'CORMORUS', 'VLADUT', 1890201382244, 27, '0724367298', 32, 1870, 'PAZNIC', NULL, 45, 7);  
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'TARTAREANU', 'GEORGEL', 1930505112233, 37, '0724651324', 28, 1550, 'PAZNIC', NULL, 55, 2);  
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'VASILOIU', 'ANASTASIA', 2870606381122, 47, '0777881923', 34, 2300, 'PAZNIC', NULL, 15, 4); 
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'MACARAGIU', 'TOMA', 1850821403224, 47, '0767263681', 35, 3300, 'MANAGER', 75, NULL, NULL);  
+
+INSERT INTO ANGAJAT_AGENTIE
+VALUES(angajat_agen_id.nextval, 'DUMITRU', 'VASILE', 1750919373466, 37, '0744913824', 45, 1900, 'PAZNIC', NULL, 35, 25);  
+
+SELECT * FROM ANGAJAT_AGENTIE;
+
+COMMIT;
+
+--TABEL HALA
+
+CREATE TABLE HALA
+                (
+                cod_hala NUMBER(5),
+                cod_serv_auto NUMBER(5) CONSTRAINT fkey_serv_auto_hala REFERENCES SERVICE_AUTO(cod_serv_auto) ON DELETE CASCADE,
+                suprafata NUMBER(5) NOT NULL,
+                inaltime NUMBER(3) NOT NULL,
+                latime NUMBER(3) NOT NULL,
+                CONSTRAINT pkey_compus_hala PRIMARY KEY (cod_hala, cod_serv_auto)
+                );
+
+CREATE SEQUENCE hala_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 1
+NOCACHE;
+
+CREATE SEQUENCE hala_serv_auto_id
+MINVALUE 15
+MAXVALUE 55
+START WITH 15
+INCREMENT BY 10
+CYCLE
+NOCACHE;
+
+INSERT INTO HALA
+VALUES (hala_id.nextval, hala_serv_auto_id.nextval, 200, 4, 10);
+
+INSERT INTO HALA
+VALUES (hala_id.currval, hala_serv_auto_id.nextval, 150, 6, 12);
+
+INSERT INTO HALA
+VALUES (hala_id.currval, hala_serv_auto_id.nextval, 180, 5, 8);
+
+INSERT INTO HALA
+VALUES(hala_id.currval, hala_serv_auto_id.nextval, 190, 7, 15);
+
+INSERT INTO HALA
+VALUES(hala_id.currval, hala_serv_auto_id.nextval, 250, 6, 13);
+
+INSERT INTO HALA
+VALUES(hala_id.nextval, hala_serv_auto_id.nextval, 260, 7, 12);
+
+INSERT INTO HALA
+VALUES(hala_id.currval, hala_serv_auto_id.nextval, 165, 9, 7);
+
+INSERT INTO HALA
+VALUES(hala_id.currval, hala_serv_auto_id.nextval, 170, 2, 16);
+
+INSERT INTO HALA
+VALUES(hala_id.currval, hala_serv_auto_id.nextval, 167, 6, 7);
+
+INSERT INTO HALA
+VALUES(hala_id.currval, hala_serv_auto_id.nextval, 180, 3, 8);
+
+SELECT * FROM HALA;
+
+COMMIT;
+
+--TABEL CLIENT
+
+CREATE TABLE CLIENT
+                (
+                cod_client NUMBER(5) CONSTRAINT pkey_client PRIMARY KEY,
+                nume VARCHAR2(25) NOT NULL,
+                prenume VARCHAR2(25) NOT NULL,
+                varsta NUMBER(3) NOT NULL,
+                CNP VARCHAR2(13) NOT NULL,
+                nr_telefon VARCHAR2(10) NOT NULL,
+                nr_inmatriculare VARCHAR2(8) NOT NULL,
+                serie_masina VARCHAR2(17) NOT NULL
+                );
+
+CREATE SEQUENCE client_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 1100
+NOCACHE;
+        
+INSERT INTO CLIENT
+VALUES (client_id.nextval, 'BUTA', 'GABRIEL-SEBASTIAN', 19, 5011004123456, '0755211798', 'VL04BGS', 'WAULC68E92A140677');
+
+INSERT INTO CLIENT
+VALUES (client_id.nextval, 'MARINEL', 'VALERIAN', 33, 1880101374432, '0766788798', 'VS01VLR', 'WDCYC7CF8DX201851');
+
+INSERT INTO CLIENT
+VALUES (client_id.nextval, 'DIACONESCU', 'CRISTIAN-DANIEL', 53, 1671209280773, '0766788798', 'OT67OTV', 'YV1AW8800P1960374');
+
+INSERT INTO CLIENT
+VALUES (client_id.nextval, 'VOICULESCU', 'VLAD-VASILE', 37, 1830906153555, '0722897254', 'DB96VVV', 'WBSBF0321SEN91670');
+
+INSERT INTO CLIENT
+VALUES (client_id.nextval, 'ANDREESCU', 'VASILICA', 32, 2881109186679, '0782349842', 'GJ88VSL', 'WAUZZZ4BZ1N086470');
+
+SELECT * FROM CLIENT;
+
+COMMIT;
+
+--TABEL APARTINE
+
+CREATE TABLE APARTINE 
+                    (
+                    cod_client NUMBER(5) NOT NULL,
+                    cod_serv_auto NUMBER(5) NOT NULL, 
+                    data_introducere DATE NOT NULL,
+                    CONSTRAINT fkey_cod_client_apar FOREIGN KEY (cod_client) REFERENCES CLIENT(cod_client),
+                    CONSTRAINT fkey_cod_serv_auto_apar FOREIGN KEY (cod_serv_auto) REFERENCES SERVICE_AUTO(cod_serv_auto) ON DELETE CASCADE,
+                    CONSTRAINT pkey_cc_csa PRIMARY KEY (cod_client, cod_serv_auto) -- cc = cod_client, csa = cod_serv_auto
+                    );
+
+CREATE SEQUENCE apartine_client_id
+MINVALUE 1100
+MAXVALUE 5500
+START WITH 1100
+INCREMENT BY 1100
+CYCLE
+NOCACHE;
+
+CREATE SEQUENCE apartine_serv_id
+MINVALUE 0
+START WITH 5
+INCREMENT BY 10
+NOCACHE;
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.nextval, TO_DATE('14-02-2021', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('04-12-2020', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('16-09-2020', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('14-04-2021', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('23-12-2021', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.nextval, TO_DATE('12-12-2019', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('11-09-2020', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('04-05-2021', 'DD-MM-YYYY'));
+
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('02-02-2018', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.currval, TO_DATE('29-07-2020', 'DD-MM-YYYY'));
+
+INSERT INTO APARTINE
+VALUES (apartine_client_id.nextval, apartine_serv_id.nextval, TO_DATE('14-10-2018', 'DD-MM-YYYY'));
+
+SELECT * FROM APARTINE;
+
+COMMIT;
+
+--TABEL BRAND_BANC
+
+CREATE TABLE BRAND_BANC
+                        (
+                        cod_brand_banc NUMBER(5) CONSTRAINT pkey_brand_banc PRIMARY KEY,
+                        denumire_brand VARCHAR2(25) NOT NULL,
+                        tara_origine VARCHAR2(25) NOT NULL,
+                        lungime NUMBER(5) NOT NULL,
+                        latime NUMBER(5) NOT NULL,          --toate exprimate in centimetrii mai putin grosime_tabla
+                        inaltime NUMBER(5) NOT NULL,
+                        grosime_tabla NUMBER(5) NOT NULL      --exprimata in milimetrii
+                        );
+          
+CREATE SEQUENCE brand_banc_id
+MINVALUE 0
+START WITH 410
+INCREMENT BY 1
+NOCACHE;
+
+INSERT INTO BRAND_BANC
+VALUES (brand_banc_id.nextval, 'KARCHER', 'GERMANIA', 200, 80, 130, 8);
+
+INSERT INTO BRAND_BANC
+VALUES (brand_banc_id.nextval, 'DEPOSIX', 'IRLANDA', 220, 90, 135, 5);
+
+INSERT INTO BRAND_BANC
+VALUES (brand_banc_id.nextval, 'SAFE-FISCHER', 'BELGIA', 150, 70, 140, 13);
+
+INSERT INTO BRAND_BANC
+VALUES (brand_banc_id.nextval, 'BOXBOX', 'AFRICA DE SUD', 170, 100, 150, 9);
+
+INSERT INTO BRAND_BANC
+VALUES (brand_banc_id.nextval, 'FLEXIDEP', 'INDIA', 200, 70, 100, 7);
+
+SELECT * FROM BRAND_BANC;
+COMMIT;
+
+--TABEL BANC_LUCRU
+
+CREATE TABLE BANC_LUCRU
+                    (
+                    cod_banc_lucru NUMBER(5) CONSTRAINT pkey_banc_lucru PRIMARY KEY,
+                    cod_brand_banc NUMBER(5) NOT NULL,
+                    nr_sertare NUMBER(2),
+                    CONSTRAINT fkey_brnd_bnc_bnc_lcr FOREIGN KEY (cod_brand_banc) REFERENCES BRAND_BANC(cod_brand_banc)
+                    );
+
+CREATE SEQUENCE banc_lucru_id
+MINVALUE 510
+START WITH 510
+INCREMENT BY 1
+NOCACHE;
+
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 415, 3);
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 415, NULL);
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 412, 5);
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 411, 10);
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 413, 8);
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 414, 2);
+
+INSERT INTO BANC_LUCRU
+VALUES (banc_lucru_id.nextval, 415, 16);
+
+SELECT * FROM BANC_LUCRU;
+
+COMMIT;
+
+--TABEL TRUSA_SCULE
+
+CREATE TABLE TRUSA_SCULE
+                        (
+                        cod_trusa_scule NUMBER(5)  CONSTRAINT pkey_trusa_scule PRIMARY KEY,
+                        denumire VARCHAR2(25),
+                        brand VARCHAR2(25),
+                        rating NUMBER(2)
+                        );
+
+CREATE SEQUENCE trusa_scule_id
+MINVALUE 0
+START WITH 6120
+INCREMENT BY 1
+NOCACHE;
+
+INSERT INTO TRUSA_SCULE
+VALUES (trusa_scule_id.nextval, 'KRONEKER FX-5230', 'KRONEKER', 7);
+
+INSERT INTO TRUSA_SCULE
+VALUES (trusa_scule_id.nextval, 'KRONEKER FX-7360', 'KRONEKER', 9);
+
+INSERT INTO TRUSA_SCULE
+VALUES (trusa_scule_id.nextval, 'FILINGER ARAUTER 3', 'FILINGER', 6);
+
+INSERT INTO TRUSA_SCULE
+VALUES (trusa_scule_id.nextval, 'FILINGER MARAUDER 4', 'FILINGER', 8);
+
+INSERT INTO TRUSA_SCULE
+VALUES (trusa_scule_id.nextval, 'PARPARIDUS SSD-720', 'PARPARIDUS', 10);
+
+SELECT * FROM TRUSA_SCULE;
+COMMIT;
+
+--TABEL ANGAJAT
+
+CREATE TABLE ANGAJAT
+                    (
+                    cod_angajat NUMBER(5) CONSTRAINT pkey_angajat PRIMARY KEY,
+                    cod_serv_auto NUMBER(5),
+                    cod_trusa_scule NUMBER(5),
+                    nume VARCHAR2(25) NOT NULL,
+                    prenume VARCHAR2(25) NOT NULL,
+                    nr_telefon VARCHAR(10) NOT NULL,
+                    salariu NUMBER(5),
+                    tip_angajat VARCHAR2(25) NOT NULL,   --   INGINER/MECANIC
+                    facultate VARCHAR2(50),
+                    specializare_facultate VARCHAR2(25),
+                    specializare_liceu VARCHAR2(25),
+                    CONSTRAINT fkey_tr_sc_ang FOREIGN KEY (cod_trusa_scule) REFERENCES TRUSA_SCULE(cod_trusa_scule),
+                    CONSTRAINT fkey_serv_auto_ang FOREIGN KEY (cod_serv_auto) REFERENCES SERVICE_AUTO(cod_serv_auto) ON DELETE CASCADE
+                    );
+
+CREATE SEQUENCE angajat_id
+MINVALUE 0
+START WITH 7130
+INCREMENT BY 1
+NOCACHE;
+
+CREATE SEQUENCE angajat_serv_auto_id
+MINVALUE 15
+MAXVALUE 55
+START WITH 15
+INCREMENT BY 10
+CYCLE
+NOCACHE;
+
+CREATE SEQUENCE angajat_trusa_scule_id
+MINVALUE 6121
+MAXVALUE 6125
+START WITH 6121
+INCREMENT BY 1
+CYCLE
+NOCACHE;
+INSERT INTO ANGAJAT
+VALUES(angajat_id.nextval, angajat_serv_auto_id.nextval, angajat_trusa_scule_id.nextval, 'RADULESCU', 'VALERIAN', '0791389123', 4500, 'INGINER', 'FACULTATEA DE MATEMATICA SI INFORMATICA UNIBUC', 'MATEMATICA', NULL);
+
+INSERT INTO ANGAJAT
+VALUES(angajat_id.nextval,  angajat_serv_auto_id.nextval, angajat_trusa_scule_id.nextval, 'DRAGOMIROIU', 'DEMIAN', '0766243657', 2500, 'MECANIC', NULL, NULL, 'MECANICA');
+
+INSERT INTO ANGAJAT
+VALUES(angajat_id.nextval,  angajat_serv_auto_id.nextval, angajat_trusa_scule_id.nextval, 'MLADINOVICI', 'ANDREI', '0777347729', 7500, 'INGINER', 'FACULTATEA DE MECANICA SI MECATRONICA UPB', 'MECANICA', NULL);
+
+INSERT INTO ANGAJAT
+VALUES(angajat_id.nextval,  angajat_serv_auto_id.nextval, angajat_trusa_scule_id.nextval, 'VLADULESCU', 'IONEL', '0782917281', 3000, 'MECANIC', NULL, NULL, 'MECANICA CAMIOANELOR');
+
+INSERT INTO ANGAJAT
+VALUES(angajat_id.nextval,  angajat_serv_auto_id.nextval, angajat_trusa_scule_id.nextval, 'VASILESCU', 'FLAVIUS', '0731100322', 3900, 'MECANIC', NULL, NULL, 'TINICHIGERIE');
+
+INSERT INTO ANGAJAT
+VALUES(angajat_id.nextval,  angajat_serv_auto_id.nextval, angajat_trusa_scule_id.nextval, 'MARINESCU', 'GIGEL', '0721999821', 1900, 'MECANIC', NULL, NULL, 'VOPSITOR');
+
+SELECT * FROM ANGAJAT;
+COMMIT;
+
+--TABEL BRAND_ELEVATOR
+
+CREATE TABLE BRAND_ELEVATOR
+                            (
+                            cod_brand_elevator NUMBER(5) CONSTRAINT pkey_brnd_elev PRIMARY KEY,
+                            denumire_brand VARCHAR2(25)NOT NULL,
+                            tara_fabricatie VARCHAR2(25) NOT NULL,
+                            inaltime NUMBER(3) NOT NULL,
+                            latime NUMBER(3) NOT NULL,
+                            capacitate_ridicare NUMBER(2) NOT NULL
+                            );
+
+CREATE SEQUENCE brand_elevator_id
+MINVALUE 0
+START WITH 990
+INCREMENT BY 1
+NOCACHE;
+
+INSERT INTO BRAND_ELEVATOR
+VALUES (brand_elevator_id.nextval, 'LIFTOMEX', 'OLANDA', 250, 300, 12);
+
+INSERT INTO BRAND_ELEVATOR
+VALUES (brand_elevator_id.nextval, 'RBBT', 'GERMANIA', 195, 260, 8);
+
+INSERT INTO BRAND_ELEVATOR
+VALUES (brand_elevator_id.nextval, 'YNA', 'ROMANIA', 185, 245, 7);
+
+INSERT INTO BRAND_ELEVATOR
+VALUES (brand_elevator_id.nextval, 'LIFTITUP', 'SUA', 265, 335, 17);
+
+INSERT INTO BRAND_ELEVATOR
+VALUES (brand_elevator_id.nextval, 'YELIETOT', 'VIETNAM', 190, 260, 9);
+
+SELECT * FROM BRAND_ELEVATOR;
+COMMIT;
+                            
+                            
+
+
+
+
+--TABEL SPATIU_REPARARE
+
+CREATE TABLE SPATIU_REPARARE
+                            (
+                            cod_serv_auto NUMBER(5),
+                            cod_hala NUMBER(5),
+                            cod_spatiu_reparare NUMBER(5),
+                            cod_banc_lucru NUMBER(5),
+                            suprafata_util NUMBER(3),
+                            tip_spatiu VARCHAR2(25) NOT NULL,   --   ELEVATOR/CANAL
+                            cod_elevator NUMBER(5),
+                            adancime NUMBER(3),
+                            latime NUMBER(3),
+                            CONSTRAINT fkey_csa_sp_rep FOREIGN KEY (cod_serv_auto) REFERENCES SERVICE_AUTO(cod_serv_auto),
+                            CONSTRAINT fkey_ch_sp_rep FOREIGN KEY (cod_hala, cod_serv_auto) REFERENCES HALA(cod_hala, cod_serv_auto) ON DELETE CASCADE,
+                            CONSTRAINT pkey_csa_ch_csr PRIMARY KEY (cod_serv_auto, cod_hala, cod_spatiu_reparare),
+                            CONSTRAINT fkey_cod_elev_sp_rep FOREIGN KEY (cod_elevator) REFERENCES BRAND_ELEVATOR(cod_brand_elevator),
+                            CONSTRAINT fkey_cod_banc_lcr_sp_rep FOREIGN KEY (cod_banc_lucru) REFERENCES BANC_LUCRU(cod_banc_lucru)
+                            );
+
+
+CREATE SEQUENCE spatiu_rep_serv_auto_id
+MINVALUE 15
+MAXVALUE 55
+START WITH 15
+INCREMENT BY 10
+CYCLE
+NOCACHE;
+
+CREATE SEQUENCE spatiu_rep_hala_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 1
+NOCACHE;
+             
+CREATE SEQUENCE spatiu_rep_sp_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 1
+NOCACHE;
+
+CREATE SEQUENCE spatiu_rep_banc_id
+MINVALUE 511
+MAXVALUE 516
+START WITH 511
+CYCLE
+INCREMENT BY 1
+NOCACHE;
+                            
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.nextval, spatiu_rep_sp_id.nextval, spatiu_rep_banc_id.nextval, 20, 'ELEVATOR', 993, NULL, NULL);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 25, 'CANAL', NULL, 180, 80);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 22, 'ELEVATOR', 991, NULL, NULL);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 26, 'ELEVATOR', 991, NULL, NULL);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 19, 'ELEVATOR', 992, NULL, NULL);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.nextval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 21, 'CANAL', NULL, 175, 90);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 20, 'CANAL', NULL, 170, 77);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 22, 'ELEVATOR', 994, NULL, NULL);
+
+INSERT INTO SPATIU_REPARARE
+VALUES (spatiu_rep_serv_auto_id.nextval, spatiu_rep_hala_id.currval, spatiu_rep_sp_id.currval, spatiu_rep_banc_id.nextval, 25, 'CANAL', NULL, 170, 85);
+
+SELECT * FROM SPATIU_REPARARE;
+COMMIT;
+
+
+--TABEL REPARA
+
+CREATE TABLE REPARA
+                    (
+                    cod_angajat NUMBER(5),
+                    cod_client NUMBER(5),
+                    cod_serv_auto NUMBER(5),
+                    cod_hala NUMBER(5),
+                    cod_spatiu_reparare NUMBER(5), 
+                    data_incepere DATE,
+                    data_sfarsit DATE,
+                    CONSTRAINT const_ds_de CHECK(data_incepere < data_sfarsit),
+                    CONSTRAINT fkey_ca_rpr FOREIGN KEY (cod_angajat) REFERENCES ANGAJAT(cod_angajat) ON DELETE CASCADE,
+                    CONSTRAINT fkey_cc_rpr FOREIGN KEY (cod_client) REFERENCES CLIENT(cod_client),
+                    CONSTRAINT fkey_ch_rpr FOREIGN KEY (cod_hala, cod_serv_auto) REFERENCES HALA(cod_hala, cod_serv_auto),
+                    CONSTRAINT fkey_csr_rpr FOREIGN KEY (cod_hala, cod_serv_auto, cod_spatiu_reparare) REFERENCES SPATIU_REPARARE(cod_hala, cod_serv_auto, cod_spatiu_reparare) ON DELETE CASCADE,
+                    CONSTRAINT pkey_rpr PRIMARY KEY (cod_angajat, cod_client, cod_serv_auto, cod_hala, cod_spatiu_reparare, data_incepere)
+                    );
+
+CREATE SEQUENCE repara_ang_id
+MINVALUE 7131
+MAXVALUE 7135
+START WITH 7131
+CYCLE
+INCREMENT BY 1
+NOCACHE;
+
+CREATE SEQUENCE repara_client_id
+MINVALUE 1100
+MAXVALUE 5500
+START WITH 1100
+CYCLE
+INCREMENT BY 1100
+NOCACHE;
+
+CREATE SEQUENCE repara_serv_auto_id
+MINVALUE 15
+MAXVALUE 55
+START WITH 15
+CYCLE
+INCREMENT BY 10
+NOCACHE;
+
+CREATE SEQUENCE repara_hala_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 1
+NOCACHE;
+
+CREATE SEQUENCE repara_sp_rep_id
+MINVALUE 0
+START WITH 0
+INCREMENT BY 1
+NOCACHE;
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.nextval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.nextval, repara_sp_rep_id.nextval, TO_DATE('29-07-2020', 'DD-MM-YYYY'), TO_DATE('03-08-2020', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('31-08-2020', 'DD-MM-YYYY'), TO_DATE('03-09-2020', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('11-09-2020', 'DD-MM-YYYY'), TO_DATE('19-09-2020', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.nextval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('04-05-2021', 'DD-MM-YYYY'), TO_DATE('09-05-2021', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('23-12-2021', 'DD-MM-YYYY'), TO_DATE('02-01-2022', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('14-04-2021', 'DD-MM-YYYY'), TO_DATE('17-04-2021', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.nextval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('14-02-2021', 'DD-MM-YYYY'), TO_DATE('16-02-2021', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('12-12-2019', 'DD-MM-YYYY'), TO_DATE('16-12-2019', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('16-03-2020', 'DD-MM-YYYY'), TO_DATE('24-03-2020', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.nextval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('30-09-2021', 'DD-MM-YYYY'), TO_DATE('16-10-2021', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('11-01-2020', 'DD-MM-YYYY'), TO_DATE('16-02-2020', 'DD-MM-YYYY'));
+
+INSERT INTO REPARA
+VALUES (repara_ang_id.currval, repara_client_id.nextval, repara_serv_auto_id.nextval, repara_hala_id.currval, repara_sp_rep_id.currval, TO_DATE('17-12-2021', 'DD-MM-YYYY'), TO_DATE('26-12-2021', 'DD-MM-YYYY'));
+
+SELECT * FROM REPARA;
+COMMIT;
